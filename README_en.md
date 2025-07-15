@@ -1,6 +1,9 @@
 # CSV to OBJ Converter
 
+
 A Python tool for converting vertex CSV files exported from RenderDoc into OBJ 3D model files.
+
+[简体中文](./README_zh_cn.md)
 
 ## Features
 

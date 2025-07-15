@@ -1,16 +1,16 @@
 
 # CSV to OBJ Converter
-[English Version](./README_en.md)
 
 一个用于将RenderDoc导出的顶点CSV文件转换为OBJ 3D模型文件的Python工具。
 
+[English Version](./README_en.md)
+
+
 ## 功能特性
 
--  **智能列检测**: 自动识别CSV文件中的位置(Position)、法线(Normal)和纹理坐标(TexCoord)数据列
+-  **列检测**: 自动识别CSV文件中的位置(Position)、法线(Normal)和纹理坐标(TexCoord)数据列
 -  **批量转换**: 支持单文件转换或批量处理当前目录下的所有CSV文件
 -  **三角面支持**: 专门为游戏中的三角面列表(Triangle List)拓扑结构设计
--  **灵活输出**: 根据可用数据自动生成合适的OBJ面格式
--  **编码兼容**: 支持UTF-8编码，确保中文等字符正确处理
 
 ## 系统要求
 
@@ -170,16 +170,7 @@ python csv_to_obj.py
 - 自动处理三角面的顶点、UV和法线索引对应关系
 
 
-*Thinking...*
 
-> 用户要求我把之前关于PNG/EXR问题和UV翻转问题的回答整理成README文档中的FAQ部分。我需要用清晰、简洁的格式来呈现这些技术问题和解决方案，让用户能够快速理解问题原因和解决方法。
-> 
-> 我应该：
-> 1. 使用标准的FAQ格式
-> 2. 简化技术术语，但保持准确性
-> 3. 提供实用的解决方案
-> 4. 用Markdown格式编写
-> 5. 按照重要性和常见程度排序
 
 # FAQ 
 
