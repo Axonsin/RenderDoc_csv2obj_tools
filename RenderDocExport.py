@@ -8,8 +8,8 @@ import csv
 
 # Configuration
 folderName = "D:/capMesh1"
-startIndex = 475
-endIndex = 759
+startIndex = 1200
+endIndex = 2000
 
 isPrint = False
 
@@ -259,12 +259,14 @@ def printMeshData(controller, meshData, draw):
 				newStr = headFormat.format(attr.name, formatxyzw[i])
 				fileheader.append(newStr)
 
-	# Create CSV file for mesh data (keep organized in event subfolders)
-	csvArray.append(fileheader)
-	if not os.path.exists("{0}/{1}".format(folderName, draw.eventId)):
-		os.makedirs("{0}/{1}".format(folderName, draw.eventId))
+	# Create models folder if it doesn't exist
+	modelsFolder = "{0}/models".format(folderName)
+	if not os.path.exists(modelsFolder):
+		os.makedirs(modelsFolder)
 
-	outPath = "{0}/{1}/model.csv".format(folderName, draw.eventId)
+	# Create CSV file with EID in filename, all in models folder
+	csvArray.append(fileheader)
+	outPath = "{0}/model_event{1}.csv".format(modelsFolder, draw.eventId)
 	csvFile = open(outPath, "w", newline='')
 	writer = csv.writer(csvFile)
 	
@@ -409,4 +411,6 @@ else:
 
 	rd.ShutdownReplay()
 
-print("Export completed! All textures saved in: {0}/textures/".format(folderName))
+print("Export completed!")
+print("Textures saved in: {0}/textures/".format(folderName))
+print("Models saved in: {0}/models/".format(folderName))
