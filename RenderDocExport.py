@@ -31,7 +31,7 @@ class MeshData(rd.MeshFormat):
 
 def pySaveTexture(resourceId, eventId, controller, textureType="texture"):
 	"""
-	Save texture to disk. All textures are saved in a single folder.
+	Save texture to disk as PNG. All textures are saved in a single folder.
 	Args:
 		resourceId: The resource ID of the texture
 		eventId: The event ID for naming
@@ -61,6 +61,40 @@ def pySaveTexture(resourceId, eventId, controller, textureType="texture"):
 	outTexPath = "{0}/{1}.png".format(textureFolder, filename)
 	controller.SaveTexture(texsave, outTexPath)
 	print("Saved texture: {0}".format(outTexPath))
+	return True
+
+def pySaveTextureEXR(resourceId, eventId, controller, textureType="texture"):
+	"""
+	Save texture to disk as EXR. All EXR textures are saved in a separate folder.
+	Args:
+		resourceId: The resource ID of the texture
+		eventId: The event ID for naming
+		controller: The replay controller
+		textureType: Type identifier for filename (e.g., "texture", "output")
+	"""
+	texsave = rd.TextureSave()
+	texsave.resourceId = resourceId
+	if texsave.resourceId == rd.ResourceId.Null():
+		return False
+
+	# Create EXR texture folder if it doesn't exist
+	textureExrFolder = "{0}/textures_exr".format(folderName)
+	if not os.path.exists(textureExrFolder):
+		os.makedirs(textureExrFolder)
+
+	# Generate unique filename with eventId and resourceId
+	filename = "{0}_event{1}_{2}".format(textureType, eventId, str(int(texsave.resourceId)))
+	
+	# Set texture save parameters for EXR
+	texsave.mip = 0
+	texsave.slice.sliceIndex = 0
+	texsave.alpha = rd.AlphaMapping.Preserve
+	texsave.destType = rd.FileType.EXR
+
+	# Save texture to the EXR texture folder
+	outTexPath = "{0}/{1}.exr".format(textureExrFolder, filename)
+	controller.SaveTexture(texsave, outTexPath)
+	print("Saved EXR texture: {0}".format(outTexPath))
 	return True
 
 def findIndexDrawLoop(d, index):
@@ -152,13 +186,17 @@ def getMeshInputs(controller, draw):
 	vbs = state.GetVBuffers()
 	attrs = state.GetVertexInputs()
 	
-	# Extract textures used by fragment shader - all textures saved to single folder
+	# Extract textures used by fragment shader - save both PNG and EXR formats
 	usedDescriptors = state.GetReadOnlyResources(renderdoc.ShaderStage.Fragment)
 	for usedDescriptor in usedDescriptors:
 		res = usedDescriptor.descriptor.resource
 		if res != rd.ResourceId.Null():
 			print("Found texture resource: {0}".format(res))
+			# Save as PNG
 			if not pySaveTexture(res, draw.eventId, controller, "input"):
+				break
+			# Save as EXR
+			if not pySaveTextureEXR(res, draw.eventId, controller, "input"):
 				break
 	
 	meshInputs = []
@@ -270,9 +308,13 @@ def printMeshData(controller, meshData, draw):
 	csvFile = open(outPath, "w", newline='')
 	writer = csv.writer(csvFile)
 	
-	# Save output textures to the main texture folder
+	# Save output textures in both PNG and EXR formats
 	for inputIter in draw.outputs:
+		# Save as PNG
 		if not pySaveTexture(inputIter, draw.eventId, controller, "output"):
+			break
+		# Save as EXR
+		if not pySaveTextureEXR(inputIter, draw.eventId, controller, "output"):
 			break
 
 	# Process each vertex
@@ -412,5 +454,6 @@ else:
 	rd.ShutdownReplay()
 
 print("Export completed!")
-print("Textures saved in: {0}/textures/".format(folderName))
 print("Models saved in: {0}/models/".format(folderName))
+print("PNG textures saved in: {0}/textures/".format(folderName))
+print("EXR textures saved in: {0}/textures_exr/".format(folderName))
